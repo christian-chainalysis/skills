@@ -1,24 +1,30 @@
 #!/bin/sh
 # Install or update agent skills from christian-chainalysis/skills.
 #
-#   curl -fsSL https://raw.githubusercontent.com/christian-chainalysis/skills/main/install.sh | sh
-#   curl -fsSL .../install.sh | sh -s -- judge pr     # only some skills
-#   curl -fsSL .../install.sh | sh -s -- --list       # show what is available
+#   curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh
+#   curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh -s -- judge pr   # only some
+#   curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh -s -- --list     # what is available
 #
-# Copies each skill into ~/.claude/skills (read by Claude Code and opencode),
-# and into the Pi and Codex skills folders when they exist. A SKILL.md you edited by hand is kept
-# as SKILL.md.bak before it is replaced.
+# Updates each skill wherever a copy already lives, in any agent's skills folder.
+# A skill with no copy yet goes into ~/.claude/skills, which Claude Code and
+# opencode both read. A SKILL.md you edited by hand is kept as SKILL.md.bak.
+# Symlinked skills belong to your own setup and are left alone.
 set -eu
 
 REPO="christian-chainalysis/skills"
 REF="${SKILLS_REF:-main}"
 URL="https://codeload.github.com/$REPO/tar.gz/refs/heads/$REF"
+DEFAULT_DIR="${SKILLS_DIR:-$HOME/.claude/skills}"
 
-# Claude Code and opencode both read ~/.claude/skills. Pi and Codex get a copy
-# only when their folder already exists.
-TARGETS="$HOME/.claude/skills
+# Every folder an agent reads skills from.
+ROOTS="$HOME/.claude/skills
+$HOME/.config/opencode/skills
+$HOME/.config/opencode/skill
+$HOME/.config/agents/skills
+$HOME/.agents/skills
 $HOME/.pi/agent/skills
-$HOME/.codex/skills"
+$HOME/.codex/skills
+$HOME/.cursor/skills"
 
 say() { printf '%s\n' "$*"; }
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
@@ -49,34 +55,38 @@ else
   WANTED=$AVAILABLE
 fi
 
-mkdir -p "$HOME/.claude/skills"
+install_to() { # $1 skill, $2 destination folder
+  s=$1
+  dest=$2
+  if [ -L "$dest" ] || [ -L "$dest/SKILL.md" ]; then
+    say "skip  $dest (symlink, managed elsewhere)"
+    return
+  fi
+  mkdir -p "$dest"
+  if [ -f "$dest/SKILL.md" ]; then
+    if cmp -s "$SRC/$s/SKILL.md" "$dest/SKILL.md"; then
+      say "same  $dest"
+      return
+    fi
+    if ! { [ -f "$dest/.installed" ] && cmp -s "$dest/SKILL.md" "$dest/.installed"; }; then
+      cp "$dest/SKILL.md" "$dest/SKILL.md.bak"
+      say "kept  $dest/SKILL.md.bak (it had local edits)"
+    fi
+  fi
+  cp -R "$SRC/$s/." "$dest/"
+  cp "$SRC/$s/SKILL.md" "$dest/.installed"
+  say "ok    $dest"
+}
 
-echo "$TARGETS" | while IFS= read -r dir; do
-  [ -d "$dir" ] || continue
-  for s in $WANTED; do
-    dest="$dir/$s"
-    # A symlinked skill folder or file belongs to the user's own setup. Leave it alone.
-    if [ -L "$dest" ] || [ -L "$dest/SKILL.md" ]; then
-      say "skip  $dest (symlink, managed elsewhere)"
-      continue
+for s in $WANTED; do
+  found=0
+  for root in $ROOTS; do
+    if [ -e "$root/$s/SKILL.md" ] || [ -L "$root/$s" ]; then
+      found=1
+      install_to "$s" "$root/$s"
     fi
-    mkdir -p "$dest"
-    if [ -f "$dest/SKILL.md" ]; then
-      if cmp -s "$SRC/$s/SKILL.md" "$dest/SKILL.md"; then
-        say "same  $dest"
-        continue
-      fi
-      if [ -f "$dest/.installed" ] && cmp -s "$dest/SKILL.md" "$dest/.installed"; then
-        :
-      else
-        cp "$dest/SKILL.md" "$dest/SKILL.md.bak"
-        say "kept  $dest/SKILL.md.bak (it had local edits)"
-      fi
-    fi
-    cp -R "$SRC/$s/." "$dest/"
-    cp "$SRC/$s/SKILL.md" "$dest/.installed"
-    say "ok    $dest"
   done
+  [ "$found" -eq 1 ] || install_to "$s" "$DEFAULT_DIR/$s"
 done
 
 say ""

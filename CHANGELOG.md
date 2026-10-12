@@ -1,6 +1,11 @@
 # Changelog
 
-Newest first. Rerun the install command to get these.
+Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh` to get these.
+
+## 2026-10-12 (later)
+
+- Shorter install URL.
+- The installer updates each skill wherever you already keep it, instead of always using `~/.claude/skills`.
 
 ## 2026-10-12
 

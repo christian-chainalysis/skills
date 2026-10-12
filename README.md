@@ -16,18 +16,14 @@ Six agent skills for everyday code work. They work in Claude Code, opencode, Pi,
 Run this from any folder. Run it again to get new versions.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/christian-chainalysis/skills/main/install.sh | sh
+curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh
 ```
 
-Only some skills:
+Only some skills: add `| sh -s -- judge pr` instead of `| sh`.
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/christian-chainalysis/skills/main/install.sh | sh -s -- judge pr
-```
+The script finds each skill wherever you already keep it (the Claude Code, opencode, Pi, Codex, Cursor, or shared `~/.agents` skills folders) and updates it in place. A skill you don't have yet goes into `~/.claude/skills`, which Claude Code and opencode both read. To put new skills somewhere else, set `SKILLS_DIR=/path` before `sh`. Restart your agent after you install.
 
-The script copies each skill into `~/.claude/skills`, which Claude Code and opencode both read. It also copies them into `~/.pi/agent/skills` and `~/.codex/skills` when those folders exist. Restart your agent after you install.
-
-If you edited a `SKILL.md` by hand, the script saves your copy as `SKILL.md.bak` before it replaces it. It skips any skill folder that is a symlink, because that belongs to your own setup.
+If you edited a `SKILL.md` by hand, the script saves your copy as `SKILL.md.bak` first. It skips any skill that is a symlink, because that belongs to your own setup.
 
 ## What you need
 
