@@ -1,6 +1,6 @@
 # Skills
 
-Six agent skills for everyday code work. They work in Claude Code, opencode, Pi, and Codex.
+Seven agent skills for everyday code work. They work in Claude Code, opencode, Pi, and Codex.
 
 | Skill | What it does |
 | --- | --- |
@@ -10,6 +10,7 @@ Six agent skills for everyday code work. They work in Claude Code, opencode, Pi,
 | `/approach` | Checks whether a PR or plan solves the problem the right way, and proves alternatives in a throwaway worktree. |
 | `/explain` | Explains a concept, PR, diff, or error with an example from your own code. |
 | `/judge` | Reviews a branch, PR, or stack as a hostile reviewer. Reports only what is broken, each with the fix. |
+| `/split` | Checks whether a big PR is really several PRs. If so, shows the pieces and gives a prompt for the author's agent to split them. |
 
 ## Install or update
 
@@ -28,6 +29,7 @@ If you edited a `SKILL.md` by hand, the script saves your copy as `SKILL.md.bak`
 ## What you need
 
 - `git` and the GitHub CLI (`gh`), logged in with `gh auth login`.
+- For `/split`: `python3`.
 - For stacked PRs: git 2.38 or later and `gh extension install github/gh-stack`.
 
 The skills check for these the first time they need them, and tell you how to install what is missing.

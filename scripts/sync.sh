@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copy the published skills from a source folder into this repo, then show the diff.
+# Copy the published skills, with their scripts and other files, from a source folder into this repo, then show the diff.
 # Usage: scripts/sync.sh [source dir]   (default: ~/dev/dotfiles/home/.config/agents/skills)
 # Then review, add a CHANGELOG line, commit, and push.
 set -eu
@@ -10,7 +10,8 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 for dir in "$ROOT"/skills/*/; do
   s=$(basename "$dir")
   [ -f "$SRC/$s/SKILL.md" ] || { echo "missing: $SRC/$s/SKILL.md" >&2; exit 1; }
-  cp "$SRC/$s/SKILL.md" "$ROOT/skills/$s/SKILL.md"
+  cp -RL "$SRC/$s/." "$ROOT/skills/$s/"
+  find "$ROOT/skills/$s" \( -name .DS_Store -o -name '*.backup' -o -name '__pycache__' \) -exec rm -rf {} +
 done
 
 # Block anything that looks like a private name or secret before it goes public.

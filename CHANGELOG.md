@@ -2,6 +2,10 @@
 
 Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh` to get these.
 
+## 2026-10-15
+
+- split: new. Checks whether a big PR bundles several PRs. Says KEEP AS IS when it does not. When it does, shows each piece with code and test counts, a tree of PRs off main or stacked, and a prompt to paste into the author's agent.
+
 ## 2026-10-12 (later)
 
 - Shorter install URL.
