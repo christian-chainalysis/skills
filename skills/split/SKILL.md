@@ -26,10 +26,10 @@ The report goes to the author, so it states facts about the code, never about th
 
 1. Read the PR title, description, linked issue, and review comments, human and bot. Note any open finding and which change it lands on.
 2. Count. Run `gh pr diff <n> | python3 <skill-dir>/scripts/count.py`. It prints every hunk with its added lines and kind (code, tests, docs, other), then totals. Its numbers are the source of truth. If it exits with an error, fix the `gh` call before going on.
-3. Read every hunk and give it to a piece. Start with everything in the core. Pull a change out only when it has its own reason to exist. Done means every hunk has a piece.
-4. Test each piece other than the core against the bar below. A piece that fails goes back into the core.
-5. Check main. Run `git log --oneline <merge-base>..origin/<default> -- <changed files>`. If main already holds a piece, mark it `On main via #N` and drop it from the split.
-6. If no piece passes, the verdict is KEEP AS IS. Otherwise, find dependencies for the pieces that passed, then write the report.
+3. Find the minimum core: the fewest hunks that deliver the title. Every other change is a candidate. Done means every hunk is core or in a named candidate.
+4. Write a decision record before any verdict. One row per candidate: name, code lines, and pass or fail on each bar test, with the fact that decided it. Every fail cites a fact from the diff or main, never a feeling.
+5. Check main. Run `git log --oneline <merge-base>..origin/<default> -- <changed files>`. If main already holds a candidate, mark it `On main via #N` and drop it.
+6. The verdict follows the record. No candidate passed: KEEP AS IS. Otherwise SPLIT, then find dependencies.
 
 ## Pieces
 
@@ -45,13 +45,22 @@ These are core even when they could be removed:
 - Ways to reach the core's behavior that users need, such as keyboard or touch input for a drag feature.
 - A different layer of the same feature, such as the backend endpoint the new UI calls.
 
+A second surface is another screen or entry point that gets the same change, such as a schedule dialog beside a run page. Decide it from main, not the description:
+
+- For a fix: if the second surface shows the bug the title names on main, the fewest lines that fix it there are core. Otherwise its changes are a candidate.
+- For a feature: the same feature on a second surface is core, unless the title names only one surface.
+- Anything beyond the fewest lines, such as a rewrite or new behavior, is a candidate.
+- Lines the core needs only to compile after the PR deletes something, such as a renamed call site, are core.
+
+The core never loses what main shows. A candidate whose removal would drop something main's page has today fails the clean test.
+
 ## The bar
 
 A candidate earns its own PR only when it passes all three tests. When a test is a coin flip, it fails. Apply each test on its facts, and never lean on this rule to skip checking.
 
-1. Separate. The piece has its own reason to exist, and a reviewer could approve or reject it without the rest. Reverting it alone would make sense.
-2. Clean. Moving it means moving lines, not rewriting logic. Splitting a hunk by lines is fine. Fixing a merge conflict, or giving its tests a new file with a copied helper, is fine. Needing new logic to make either branch work is not. Every branch would pass checks alone.
-3. Worth it. Splitting saves the reviewer real effort, or keeps a real risk apart. Count it as worth it when the piece has at least about 30 lines of code, or carries a risk on its own: an unresolved review finding, a migration, a security or data change, or a change to a shared contract. A small unrelated FIX also counts when it applies cleanly to main, because a revert should take only the fix.
+1. Separate. Both checks hold. The core's own tests would pass without the candidate. The candidate has a PR title of its own that does not restate the core's title.
+2. Clean. Moving it means moving lines, not rewriting logic. Splitting a hunk by lines is fine. Fixing a merge conflict, or giving its tests a new file with a copied helper, is fine. Needing new logic to make either branch work is not. If the core's code would need a new place, order, or wrapper once the candidate leaves, that is new logic. Every branch would pass checks alone.
+3. Worth it. Splitting saves the reviewer real effort, or keeps a real risk apart. Count it as worth it when the piece has at least about 30 lines of code, or carries a risk on its own: an unresolved review finding, a migration, a security or data change, or a change to a shared contract. A small unrelated FIX also counts when it applies cleanly to main, because a revert should take only the fix. Applies cleanly means every line the fix changes is identical on main, so the agent can apply it line for line.
 
 A resolved or outdated review finding is not a risk. A "fix" that changes nothing on main is not a FIX. Check main's code before calling it one.
 
@@ -74,7 +83,8 @@ For each piece that passed, list the symbols, types, props, and files it uses th
 - A piece made from part of a hunk is an estimate. Round it to the nearest 5.
 - The core takes the remainder, so the pieces add up to the totals.
 - Write 1,000 and up with a comma. Never write `~`.
-- Add `comments N` to a piece's counts only when its comments pass 5% of its code.
+- Add `comments N` to a piece's counts only when its comments pass 5% of its code and number 5 or more.
+- Show only kinds a piece has. Never show `other`. It still counts toward the totals.
 
 ## Report
 
@@ -97,10 +107,15 @@ Formatting, because the user pastes into Slack and screenshots it:
 #4120 export reports as CSV
 
 KEEP AS IS
+- Column picker: not separate. Export tests need it.
 ```
 
-- Nothing else. No summary, no reasons, no list of side changes checked.
-- Add a bullet only for something the author must act on, such as `- <change> is on main via #N. Rebase first.`
+- No summary of the change.
+- One `Turned down` bullet per candidate with 30 or more code lines, three at most: `- <candidate>: not <test>. <deciding fact>.` These let the reader check the call.
+- Add a bullet for anything the author must act on, such as `- <change> is on main via #N. Rebase first.` Act-on bullets come first.
+- A migration number or file that collides with main is an act-on bullet. Check `git ls-tree origin/<default>` for the migration folder.
+- Five bullets at most in all.
+- No candidates of that size and nothing to act on: the verdict line alone.
 - No prompt.
 
 ### SPLIT INTO N PRS
@@ -128,7 +143,7 @@ main
 
 - N counts the core. Only pieces that passed the bar appear.
 - The title and counts carry each piece. Add one bullet only when the reason it passed is not obvious, such as a security risk or a review finding.
-- Side changes that failed the bar stay unmentioned. They live in the core.
+- Candidates with 30 or more code lines that failed the bar get a `Turned down` bullet under the core, as in KEEP AS IS.
 - The tree shows every piece. Children stack on their parent. Children of `main` go off main.
 - Never recommend cutting a feature. That is the author's call.
 
@@ -174,4 +189,4 @@ Then update PR #<n>'s description to list the new PRs, and report each PR URL wi
 
 - Every number traces to the script output or a hand split of one named hunk.
 - Every dependency traces to a symbol you found in the diff. Mark anything you could not confirm `(unverified)`.
-- A wrong split costs the author more than a big review costs the reviewer. When a piece is borderline, keep it in the core.
+- The same PR must get the same verdict on every run. If a call depends on wording or mood rather than a fact, find the fact.
