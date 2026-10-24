@@ -41,6 +41,8 @@ Never report:
 - Performance with no measurable path to mattering here.
 - "Consider", "might be cleaner", or anything you cannot state as a defect.
 
+For a race or security finding, say how likely the failure is and what the fix costs in complexity. If it needs rare timing or access no real attacker has, and the fix adds real complexity, move it to `Unverified:` so the user decides.
+
 No cap on findings. Report every real problem, two or twenty. If the count means the change needs rework rather than line edits, say so in one line under the verdict, then list them all.
 
 One pass. Stop reading once you have the fix. Keep each fix inside the diff's footprint.

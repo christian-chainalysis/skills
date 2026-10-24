@@ -6,6 +6,7 @@ Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.s
 
 - approach, explain, refine: always check whether a PR is part of a stack, using GitHub's stack list first, and work on the whole stack.
 - split: plans a stack as one change. It can merge thin PRs, split thick ones, and gives one RESTACK INTO N PRS plan for the whole stack.
+- judge: weighs how likely a race or security failure is against what the fix costs. Rare cases with a costly fix go under Unverified so you decide.
 
 ## 2026-10-15 (later)
 
