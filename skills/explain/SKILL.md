@@ -96,6 +96,8 @@ WHY IT MATTERS
 
 For a PR, the first bullet of THE IDEA says what the change lets users do, in plain product terms. The next bullets give the approach the PR takes. EXAMPLE shows it with a concrete case from the diff. WHY IT MATTERS is why this approach fits.
 
+Every time you are given a PR, check whether it is part of a stack before reading its diff, the same way the judge skill does. First run `gh api "repos/<owner>/<repo>/stacks?pull_request=<n>"`. If that is empty, follow base branches down to the default branch and find PRs based on each head going up. If it is a stack, explain the whole stack, even when the user named one PR. Read every PR's description and diff first.
+
 For a stack, teach the whole stack's idea first. Then add one short section per PR, bottom to top, after WHY IT MATTERS:
 
 ```

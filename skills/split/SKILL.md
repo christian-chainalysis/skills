@@ -16,11 +16,27 @@ The report goes to the author, so it states facts about the code, never about th
 - Run `gh auth status` before the first `gh` call. If `gh` is missing, give `brew install gh`. If logged out, ask the user to run `gh auth login` in their own terminal.
 - A PR URL: pass `-R <owner>/<repo>` from the URL to every `gh` call, because the current folder may be another repo.
 - A PR number or URL: check that PR.
-- Several PRs from one stack: check each on its own, bottom to top.
-- One PR from a stack: check only that PR.
+- Every PR: check whether it is part of a stack, the same way the judge skill does. First run `gh api "repos/<owner>/<repo>/stacks?pull_request=<n>"`. If that is empty, follow base branches down to the default branch and find PRs based on each head going up.
+- A stack, whether the user gave one PR or several: see Stacks.
 - A merged or closed PR: say so in one line, and give the human part only. No prompt.
 - No argument: the current branch's PR, or `git diff origin/<default>...HEAD` when there is none.
 - Never check out, commit, push, or comment. This skill only reads. To compare with main, run `git fetch` and read `git show origin/<default>:<path>`.
+
+## Stacks
+
+A stack is one change already cut into PRs. Plan its split once, as a whole, so that no PR's split contradicts another's.
+
+1. Count the whole stack as one diff: `git diff origin/<default>...<top head> | python3 <skill-dir>/scripts/count.py`. Also count each PR against its own base, so you know which PR holds each hunk today.
+2. Run Steps 3 to 6 on the whole diff. The stack's shared goal is the title. Each existing PR is a candidate piece. It must pass the bar like any other piece.
+3. Build one target stack from the pieces that passed. Each existing PR keeps its number when one piece maps to it, so its review history stays. A PR whose work fits in a neighbor PR merges into it. A PR that holds two pieces splits, and the new piece goes where its dependencies put it in the tree.
+4. Report the whole stack once. Use the same sections, with these changes:
+   - The title line is the stack: `#101 to #103 alerts saved filters (stack of 3)`.
+   - The verdict is `KEEP AS IS` or `RESTACK INTO N PRS`.
+   - Each piece names where its code lives today: `from #102`, or `from #102 and #103`.
+   - The tree is the target stack. Mark kept PRs with their number and new ones with `new`.
+   - The agent prompt covers the whole stack in one block, bottom up. Every branch must still pass checks alone.
+
+A stack whose PRs each pass the bar and have no second piece inside is KEEP AS IS, at any size.
 
 ## Steps
 

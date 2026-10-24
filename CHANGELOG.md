@@ -2,6 +2,11 @@
 
 Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh` to get these.
 
+## 2026-10-24
+
+- approach, explain, refine: always check whether a PR is part of a stack, using GitHub's stack list first, and work on the whole stack.
+- split: plans a stack as one change. It can merge thin PRs, split thick ones, and gives one RESTACK INTO N PRS plan for the whole stack.
+
 ## 2026-10-15 (later)
 
 - split: gives the same verdict on every run. It writes a decision record before the verdict, and KEEP AS IS now lists the big pieces it turned down and anything to fix first, such as a rebase or a migration collision.

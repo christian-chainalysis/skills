@@ -58,7 +58,7 @@ A single PR in a stack is only part of the approach. Judging it alone can give a
 
 PRs and stacks need the GitHub CLI. Before the first `gh` call, run `gh auth status`. If `gh` is missing, give the user `brew install gh` (other systems: https://cli.github.com). If they are not logged in, ask them to run `gh auth login` in their own terminal. Offer to run the install after a yes, then check again. If the user declines, work from local branches with git alone and say the PR descriptions were not read.
 
-When given a PR, check whether it is part of a stack. Follow its base branch down to the default branch, and find PRs based on its head going up, the same way the judge skill does. If it is a stack:
+Every time you are given a PR, check whether it is part of a stack before reading its diff. First run `gh api "repos/<owner>/<repo>/stacks?pull_request=<n>"`. A non-empty result lists the stack bottom to top. An empty result means the PRs are not linked, so follow the PR's base branch down to the default branch and find PRs based on its head going up, the same way the judge skill does. If it is a stack:
 
 - Judge the approach of the whole stack, not the one PR. GOAL and PROBLEM describe the whole feature.
 - Read every PR's description and diff before the verdict. Fetch descriptions once with `gh pr list --json number,title,body,headRefName,baseRefName` saved to a temp file. Read diffs with `gh pr diff <n> --name-only` first, then per file.

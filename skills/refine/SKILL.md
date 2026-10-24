@@ -22,7 +22,7 @@ Best time to refine is before /pr, on the single branch. One pass, no stack to r
 
 Stacks need the GitHub CLI, logged in, and git 2.38 or later for `--update-refs`. Check with `gh auth status` and `git --version`. If one is missing, give the fix: `brew install gh`, `gh auth login` in the user's own terminal, or `brew install git`. Offer to run the install after a yes, then check again. If the user declines, refine only the current branch.
 
-Detect the stack the same way the judge skill does: follow each PR's base branch down to the default branch, and find PRs based on each head going up.
+Detect the stack the same way the judge skill does. First run `gh api "repos/<owner>/<repo>/stacks?pull_request=<n>"`. A non-empty result lists the stack bottom to top. An empty result means the PRs are not linked, so follow each PR's base branch down to the default branch and find PRs based on each head going up.
 
 - Refine each PR against its own base (`gh pr diff <n>`), so each removal lands on the PR that added the line.
 - Show one plan for the whole stack. Use the same sections, with one line per PR under the top section:
