@@ -24,6 +24,7 @@ The user may be a teammate who installed this skill without its tools. Check eac
 | GitHub CLI | `gh --version` | `brew install gh` on macOS. Other systems: https://cli.github.com | None. This skill cannot push PRs without it. |
 | gh login | `gh auth status` | `gh auth login` in the user's terminal | None. |
 | git 2.38+ | `git --version` | `brew install git` on macOS | Single PRs work. Stacks need it. |
+| gh 2.103+ for screenshots | `gh pr edit --help \| grep -q -- --attach` | `brew upgrade gh` | Ask the user to drag the images into the PR description in the browser. |
 | gh stack | `gh stack --help` | `gh extension install github/gh-stack` | Build the stack without it. See Stacked PRs. |
 | Package manager | Matches the lockfile, for example `pnpm --version` | `corepack enable`, or the repo's README | None for checks. Do not push code that was not checked. |
 
@@ -189,6 +190,18 @@ If any check fails, fix the issue, commit the fix, and re-run.
 
 - Analyze commits on this branch vs main: `git log main..HEAD --oneline`
 - Run `gh pr create` with title and body
+- If the PR changes what users see, add screenshots as in Screenshots below.
+
+### Screenshots
+
+Add before and after screenshots to any PR that changes what users see.
+
+1. Capture both with a browser tool, such as Playwright, against the repo's Storybook or dev server. Take "before" from the default branch and "after" from this branch, with the same viewport and the same state.
+2. Make sure they differ: `shasum before.png after.png`. Matching hashes mean a stale capture, such as a server still running old code. Fix it and capture again. Then open each image and look at it yourself. Do not claim a UI fix works until you have seen it.
+3. Write the images into the body file, such as `![Before](./before.png)` and `![After](./after.png)`. Then run `gh pr edit <n> --body-file <file> --attach ./before.png --attach ./after.png`. Keep the images in the same folder as the body file, because gh reads paths in a body file relative to its folder. gh uploads the files and rewrites each reference to the uploaded copy.
+4. Never commit images to the repo or push them to an extra branch, and never link to them by commit hash.
+
+In a stack, attach each screenshot to the PR whose change it shows.
 
 ## Stacked PRs
 

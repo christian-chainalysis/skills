@@ -2,6 +2,10 @@
 
 Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh` to get these.
 
+## 2026-10-26
+
+- pr: UI changes get before and after screenshots uploaded straight into the PR description with `gh pr edit --attach`. It checks the two images differ and never commits images to the repo.
+
 ## 2026-10-24
 
 - approach, explain, refine: always check whether a PR is part of a stack, using GitHub's stack list first, and work on the whole stack.
