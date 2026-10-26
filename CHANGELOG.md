@@ -5,6 +5,8 @@ Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.s
 ## 2026-10-26
 
 - pr: UI changes get before and after screenshots uploaded straight into the PR description with `gh pr edit --attach`. It checks the two images differ and never commits images to the repo.
+- pr: every PR body gets a Proof section matched to what the PR claims: screenshots or video for UI, a before and after repro for a fix, numbers for speed. "Tests pass" and "CI is green" no longer count as proof on their own.
+- judge: lists each claim in the PR body that has no proof under a new Proof gaps section. Proof that contradicts the code is a finding.
 
 ## 2026-10-24
 

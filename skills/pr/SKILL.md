@@ -189,8 +189,27 @@ If any check fails, fix the issue, commit the fix, and re-run.
 ### 7. Create the PR
 
 - Analyze commits on this branch vs main: `git log main..HEAD --oneline`
+- Gather proof as in Proof below, before you write the body.
 - Run `gh pr create` with title and body
-- If the PR changes what users see, add screenshots as in Screenshots below.
+
+### Proof
+
+Every PR body has a `Proof:` section. Proof is something a reviewer can see without running the code, and it shows the PR does what its title claims. Match the proof to the claim:
+
+| The PR claims | Proof |
+|---|---|
+| A UI change | Before and after screenshots, as in Screenshots below. For an interaction, such as a drag or an animation, add a short video. Playwright's `recordVideo` option makes one. |
+| A bug fix | The repro on the default branch showing the bug, then the same repro on this branch showing it gone. Paste the command and the output lines that differ. A test that fails on the default branch and passes here counts. |
+| Faster or smaller | Before and after numbers from the same command on the same machine, with the command. |
+| New behavior with no UI | The command, request, or script that runs it end to end, and its output. |
+| A refactor with no behavior change | The checks that cover the moved code. For UI, before and after screenshots that match. |
+| Docs, config, or CI only | One line on what you checked, such as the CI run that used the new config. |
+
+These show the code builds, not that it works: "tests pass", "typechecks", "CI is green", "should work", "I reviewed the code". Put them next to real proof, never in place of it.
+
+Keep proof short: the few output lines that matter, not full logs. If you cannot produce proof, such as a change that needs prod data, write in the Proof section what you checked instead and what is still unproven. Tell the user in the terminal before you open the PR.
+
+In a stack, each PR carries the proof for its own change.
 
 ### Screenshots
 
@@ -327,8 +346,9 @@ Default shape, plain prose or a few bullets:
 
 - **Problem:** what was broken or missing, in one or two sentences. For a fix, include the root cause when it is not obvious.
 - **Change:** what this PR does about it, and any new dependency or pattern.
+- **Proof:** always. See Proof above.
 
-Add these only when they apply: trade-offs a reviewer would question, migration steps, follow-up work, and screenshots for UI changes. Leave out testing tables unless the user asks for them.
+Add these only when they apply: trade-offs a reviewer would question, migration steps, and follow-up work. Leave out testing tables unless the user asks for them.
 
 ## Exclusions
 

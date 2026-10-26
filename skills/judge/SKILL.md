@@ -111,6 +111,11 @@ Review the whole stack even if the user pointed at the middle. Order branches de
 
 **CI.** For a PR, run `gh pr checks <n>` and confirm the checks ran on the PR's current head commit. A failing check is a finding: read the log (`gh run view <id> --log-failed`) and quote the error in `Fails when:`. Pending or missing checks go under `Not checked:`.
 
+**Proof.** For a PR, list each claim the title and body make, then look for proof of it in the body. Proof is something a reviewer can see without running the code: before and after screenshots or video for UI, a repro failing on the base and passing on the branch for a fix, before and after numbers for speed or size, end to end output for new behavior. "Tests pass", "typechecks", "CI is green", and "should work" show the code builds, not that it works.
+
+- A claim with no proof goes under `Proof gaps:`, with the proof that would settle it.
+- Proof that contradicts the code is a finding. Examples: a screenshot of a state the code cannot reach, numbers from a command that does not run the changed path, or before and after images that are the same file.
+
 **Local runs are opt-in.** Do not install dependencies or run tests unless the user asks. At the end of the report, offer in one line exactly what a local run would check, when any of these apply:
 
 - Uncommitted work, which CI has never seen.
@@ -159,6 +164,7 @@ Fix:
 Then only the sections that apply, each a label followed by `-` items. These never change the verdict:
 
 - `Unverified:` the question the author must answer. Only when you smelled something real but could not build the failure path.
+- `Proof gaps:` each claim with no proof, and the proof that would settle it.
 - `Nits, safe to ignore:` three maximum, no fix code. Only what a coworker would actually comment on. Never go looking for these.
 - `Not checked:` what you could not reach. Never imply coverage you did not have.
 
