@@ -15,7 +15,10 @@ for dir in "$ROOT"/skills/*/; do
 done
 
 # Block anything that looks like a private name or secret before it goes public.
-if grep -rniE "${SKILLS_BLOCKLIST:-chainalysis|/Users/|api[_-]?key|token=}" "$ROOT/skills"; then
+# leak-guard reads a private term list kept outside this repo.
+command -v leak-guard >/dev/null || { echo "blocked: leak-guard is not installed." >&2; exit 1; }
+(cd "$ROOT" && leak-guard tree) || { echo "blocked: fix the lines above in the source first." >&2; exit 1; }
+if grep -rniE "/Users/|api[_-]?key|token=" "$ROOT/skills"; then
   echo "blocked: the lines above look private. Fix them in the source first." >&2
   exit 1
 fi
