@@ -11,20 +11,24 @@ Commit, rebase, validate, handle changeset, push, and create a pull request.
 
 ## Tools
 
-The user may be a teammate who installed this skill without its tools. Check each tool the first time a step needs it. When one is missing or too old, stop and help the user fix it:
+The user may be a teammate who installed this skill without its tools, or with old versions. The goal is a setup where every step works. A fallback is a worse experience, so treat a gap as something to close, not to route around.
 
-1. Say in one line what the tool does for them.
+Check up front. Before step 0, run the check for every row this run will need: screenshots if the diff touches UI, gh stack if it may split. Ask about all the gaps at once, before any work, so the user is not interrupted later. For each gap:
+
+1. Say in one line what the tool does for them and what they miss without it.
 2. Give the exact install or fix command from the table.
 3. Ask whether to run it. Run it only after a yes. Commands that open a browser, like `gh auth login`, must run in the user's own terminal, so give the command and wait.
 4. Run the check again to confirm.
 5. If the user declines, use the fallback. If there is none, stop and say what is blocked.
+
+A fallback is never silent. In the final message, name what the user still has to do by hand, with exact file paths, and the one command that would have done it for them.
 
 | Tool | Check | Install or fix | Fallback |
 |---|---|---|---|
 | GitHub CLI | `gh --version` | `brew install gh` on macOS. Other systems: https://cli.github.com | None. This skill cannot push PRs without it. |
 | gh login | `gh auth status` | `gh auth login` in the user's terminal | None. |
 | git 2.38+ | `git --version` | `brew install git` on macOS | Single PRs work. Stacks need it. |
-| gh 2.103+ for screenshots | `gh pr edit --help \| grep -q -- --attach` | `brew upgrade gh` | Ask the user to drag the images into the PR description in the browser. |
+| gh 2.103+ for screenshots | `gh pr edit --help \| grep -q -- --attach` | `brew upgrade gh` | Leave the images out of the body. Give the user the PR link and the image paths to drag into the description. |
 | gh stack | `gh stack --help` | `gh extension install github/gh-stack` | Build the stack without it. See Stacked PRs. |
 | Package manager | Matches the lockfile, for example `pnpm --version` | `corepack enable`, or the repo's README | None for checks. Do not push code that was not checked. |
 
@@ -217,8 +221,9 @@ Add before and after screenshots to any PR that changes what users see.
 
 1. Capture both with a browser tool, such as Playwright, against the repo's Storybook or dev server. Take "before" from the default branch and "after" from this branch, with the same viewport and the same state.
 2. Make sure they differ: `shasum before.png after.png`. Matching hashes mean a stale capture, such as a server still running old code. Fix it and capture again. Then open each image and look at it yourself. Do not claim a UI fix works until you have seen it.
-3. Write the images into the body file, such as `![Before](./before.png)` and `![After](./after.png)`. Then run `gh pr edit <n> --body-file <file> --attach ./before.png --attach ./after.png`. Keep the images in the same folder as the body file, because gh reads paths in a body file relative to its folder. gh uploads the files and rewrites each reference to the uploaded copy.
-4. Never commit images to the repo or push them to an extra branch, and never link to them by commit hash.
+3. Write the images into the body file, such as `![Before](./before.png)` and `![After](./after.png)`. Then pass `--attach ./before.png --attach ./after.png` to `gh pr create`, or to `gh pr edit <n> --body-file <file>` for a PR that exists. Keep the images in the same folder as the body file, because gh reads paths in a body file relative to its folder. gh uploads the files and rewrites each reference to the uploaded copy.
+4. Confirm the upload: `gh pr view <n> --json body -q .body`. Each image must point to a `github.com/user-attachments/` URL, and no `./` path may remain. If one failed, attach it again with `gh pr edit`. If it still fails, follow the fallback in Tools.
+5. Never commit images to the repo or push them to an extra branch, and never link to them by commit hash.
 
 In a stack, attach each screenshot to the PR whose change it shows.
 

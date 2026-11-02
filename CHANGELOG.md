@@ -2,6 +2,12 @@
 
 Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh` to get these.
 
+## 2026-11-02
+
+- judge: security reviews list the attacks tried, or the attack that still works, under one Attacks tried section. They stop inventing extra sections.
+- pr: checks every tool the run needs before it starts and asks about all gaps at once. When it has to fall back, it tells you exactly what is left to do by hand.
+- pr: after attaching screenshots, it confirms they uploaded and retries if one failed.
+
 ## 2026-10-26
 
 - pr: UI changes get before and after screenshots uploaded straight into the PR description with `gh pr edit --attach`. It checks the two images differ and never commits images to the repo.

@@ -165,6 +165,7 @@ Then only the sections that apply, each a label followed by `-` items. These nev
 
 - `Unverified:` the question the author must answer. Only when you smelled something real but could not build the failure path.
 - `Proof gaps:` each claim with no proof, and the proof that would settle it.
+- `Attacks tried:` security changes only. The attack that still works after the change, or, if none does, the attacks you tried, one line each. This is the only home for the Hunt step's security notes. Do not add sections such as "what held" or "still open after merge".
 - `Nits, safe to ignore:` three maximum, no fix code. Only what a coworker would actually comment on. Never go looking for these.
 - `Not checked:` what you could not reach. Never imply coverage you did not have.
 
