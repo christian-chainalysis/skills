@@ -194,6 +194,18 @@ NOT READY: 2 must fix
 
 `Fixed later in #N` and `Related: #N` go on their own line after the fix, with a blank line before. End with one `Not checked:` and one local run offer for the whole stack.
 
+## Re-approve after a rebase
+
+Use this when the user asks to approve PRs again after a rebase or a stack merge cleared their approvals. It skips a full review when only the base moved.
+
+For each PR:
+
+1. Find the head the user last approved: the `commit_id` of their newest review with state `APPROVED` or `DISMISSED` (a cleared approval shows as `DISMISSED`) in `gh api repos/<owner>/<repo>/pulls/<n>/reviews`. The current head is `headRefOid` from `gh pr view <n> --json headRefOid,baseRefName`.
+2. Compare the two. Fetch both commits by SHA (`git fetch origin <old> <new>`), then run `git range-diff --no-patch <old>~N..<old> <new>~N..<new>`, where N is the commit count at each head. Every line marked `=` means unchanged. If fetch fails, compare the sorted `+` and `-` lines of the old and new diffs instead (`gh api repos/<owner>/<repo>/compare/<base>...<head>` with the `application/vnd.github.diff` media type).
+3. Same lines: approve with `gh pr review <n> --approve`. Changed lines: judge only the new changes with the full rules above, and report before approving.
+
+Approve without waiting on CI. Name any pending check in the one-line result. Report one line per PR, such as `#575 unchanged, approved` or `#576 new commit judged: READY, approved`.
+
 ## Fixing
 
 Default to reporting only, since the code is often someone else's. Offer in one line to apply the fixes. If asked, apply them and run the repo's checks. In a stack, fix each PR on its own branch, bottom up. Then carry the fixes up: `gh stack rebase --upstack` and `gh stack push` for a tracked stack, or `git rebase --update-refs <fixed-branch>` from the top branch otherwise.

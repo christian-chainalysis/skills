@@ -2,6 +2,10 @@
 
 Newest first. Rerun `curl -fsSL christian-chainalysis.github.io/skills/install.sh | sh` to get these.
 
+## 2026-11-18
+
+- judge: when a rebase or stack merge clears your approvals, ask it to re-approve. It checks each PR's commits against the ones you approved, approves the unchanged ones right away, and reviews only what is new.
+
 ## 2026-11-02
 
 - judge: security reviews list the attacks tried, or the attack that still works, under one Attacks tried section. They stop inventing extra sections.
